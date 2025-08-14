@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>安裹客戶包裝提示</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      background-color: #f0f0f0;
+      margin: 0;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    h1 {
+      font-size: 2em;
+      margin-bottom: 10px;
+      color: #0056b3;
+      text-align: center;
+    }
+
+    .search-box {
+      margin-bottom: 20px;
+      width: 100%;
+      max-width: 400px;
+      position: relative;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 10px 40px 10px 15px;
+      font-size: 1em;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      box-sizing: border-box;
+    }
+
+    .clear-button {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      font-size: 1.2em;
+      cursor: pointer;
+      color: #888;
+      padding: 0;
+    }
+
+    .clear-button:hover {
+      color: #000;
+    }
+
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 20px;
+      width: 100%;
+      max-width: 1200px;
+    }
+
+    .customer-box {
+      background-color: #ffffff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      font-size: 1.5em;
+      font-weight: bold;
+      color: #333;
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+      aspect-ratio: 1 / 1;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      text-align: center;
+      word-break: break-word;
+      overflow: hidden;
+    }
+
+    .customer-box:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    }
+
+    .customer-box.common-message {
+      color: red;
+    }
+
+    @media (max-width: 600px) {
+      .grid-container {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 15px;
+      }
+
+      .customer-box {
+        font-size: 1.2em;
+        padding: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>安裹客戶包裝提示</h1>
+
+  <div class="search-box">
+    <input type="text" id="searchInput" placeholder="🔍 搜尋客戶名稱…">
+    <button class="clear-button" id="clearBtn" title="清除">✕</button>
+  </div>
+
+  <div id="customer-grid" class="grid-container"></div>
+
+  <script>
+    const customers = [
+      { name: '共通訊息', file: '共通訊息/' },
+      { name: '韓商鉑嵐', file: '韓商鉑嵐/' },
+      { name: '健談', file: '健談/' },
+      { name: '護生', file: '護生/' },
+      { name: '美坤', file: '美坤/' },
+      { name: '伯樂', file: '伯樂/' },
+      { name: '史特塔西', file: '史特塔西/' },
+      { name: '形成雙', file: '形成雙/' },
+      { name: '漢特', file: '漢特/' },
+      { name: '三德', file: '三德/' },
+      { name: '三滴水', file: '三滴水/' },
+      { name: '百物購', file: '百物購/' },
+      { name: '解渴享樂', file: '解渴享樂/' },
+      { name: '展鵬', file: '展鵬/' },
+      { name: '逆光', file: '逆光/' },
+      { name: '晶潾九韻', file: '晶潾九韻/' },
+      { name: '台灣秀杰', file: '台灣秀杰/' }
+    ];
+
+    const container = document.getElementById('customer-grid');
+    const searchInput = document.getElementById('searchInput');
+    const clearBtn = document.getElementById('clearBtn');
+
+    function renderCustomerGrid(filterText = '') {
+      container.innerHTML = '';
+
+      const filtered = customers.filter(c =>
+        c.name.includes(filterText.trim())
+      );
+
+      const common = filtered.find(c => c.name === '共通訊息');
+      const others = filtered.filter(c => c.name !== '共通訊息');
+      others.sort((a, b) => a.name.localeCompare(b.name, 'zh-Hant'));
+
+      const finalList = [];
+      if (common) finalList.push(common);
+      finalList.push(...others);
+
+      finalList.forEach(c => {
+        const link = document.createElement('a');
+        link.className = 'customer-box';
+        if (c.name === '共通訊息') {
+          link.classList.add('common-message');
+        }
+        link.href = c.file;
+        link.textContent = c.name;
+        container.appendChild(link);
+      });
+    }
+
+    // 初始渲染
+    renderCustomerGrid();
+
+    searchInput.addEventListener('input', (e) => {
+      renderCustomerGrid(e.target.value);
+    });
+
+    clearBtn.addEventListener('click', () => {
+      searchInput.value = '';
+      renderCustomerGrid('');
+      searchInput.focus();
+    });
+  </script>
+</body>
+</html>
