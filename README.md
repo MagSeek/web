@@ -1,2 +1,0 @@
-# magseek-web
-magseek strap
