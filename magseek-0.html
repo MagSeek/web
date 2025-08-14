@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MagSeek web</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      background-color: #f0f0f0;
+      margin: 0;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    h1 {
+      font-size: 2em;
+      margin-bottom: 20px;
+      color: #0056b3;
+      text-align: center;
+    }
+
+    .grid-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      width: 100%;
+      max-width: 1200px;
+    }
+
+    .customer-box {
+      background-color: #ffffff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      font-size: 1.5em;
+      font-weight: bold;
+      color: #333;
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+      aspect-ratio: 1 / 1;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      text-align: center;
+      word-break: break-word;
+      overflow: hidden;
+      width: 150px;
+    }
+
+    .customer-box:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    }
+
+    .customer-box.common-message {
+      color: red;
+    }
+
+    @media (max-width: 600px) {
+      .customer-box {
+        width: 120px;
+        font-size: 1.2em;
+        padding: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>MagSeek-web</h1>
+
+  <div id="customer-grid" class="grid-container"></div>
+
+  <script>
+    const customers = [
+      { name: '關於我', file: '關於我/' },
+      { name: '說明書', file: '1說明書/' },
+      { name: '操作演示', file: '2操作演示/' },
+      { name: '產品訂購', file: '3產品訂購/' },
+    ];
+
+    const container = document.getElementById('customer-grid');
+
+    function renderCustomerGrid() {
+      container.innerHTML = '';
+
+      const common = customers.find(c => c.name === '關於我');
+      const others = customers.filter(c => c.name !== '關於我');
+      
+      others.sort((a, b) => a.file.localeCompare(b.file, 'zh-Hant'));
+
+      const finalList = [];
+      if (common) finalList.push(common);
+      finalList.push(...others);
+
+      finalList.forEach(c => {
+        const link = document.createElement('a');
+        link.className = 'customer-box';
+        if (c.name === '關於我') {
+          link.classList.add('common-message');
+        }
+        link.href = c.file;
+        link.textContent = c.name;
+        container.appendChild(link);
+      });
+    }
+
+    // 初始渲染
+    renderCustomerGrid();
+  </script>
+</body>
+</html>
