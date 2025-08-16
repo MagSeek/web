@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>說明書</title>
+  <style>
+    /* 保持所有原有樣式不變 */
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+    /* ... 其他樣式保持不變 ... */
+  </style>
+</head>
+<body>
+  <!-- HTML 結構保持不變 -->
+  <header>
+    <h1>說明書</h1>
+    <a href="../" class="return-home">返回主頁</a>
+  </header>
+
+  <div class="grid" id="image-grid"></div>
+
+  <div id="lightbox">
+    <div class="image-counter" id="image-counter">1/0</div>
+    <img id="lightbox-img" src="" alt="">
+    <div id="lightbox-controls">
+      <button id="close-lightbox">✕</button>
+    </div>
+    <div class="gesture-hint" id="gesture-hint">單指滑動切換 · 雙指縮放</div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // 元素選擇
+      const imageGrid = document.getElementById('image-grid');
+      const lightbox = document.getElementById('lightbox');
+      const lightboxImg = document.getElementById('lightbox-img');
+      const closeBtn = document.getElementById('close-lightbox');
+      const imageCounter = document.getElementById('image-counter');
+      const gestureHint = document.getElementById('gesture-hint');
+
+      // 狀態變數
+      const availableImages = [];
+      let currentIndex = 0;
+      let touchStartX = 0;
+      let isSingleTouch = true;
+      let hintTimeout;
+
+      // 檢查圖片是否存在
+      function checkImageExists(url, callback) {
+        const img = new Image();
+        img.onload = function() {
+          callback(true);
+        };
+        img.onerror = function() {
+          callback(false);
+        };
+        img.src = url;
+      }
+
+      // 載入圖片
+      function loadImages() {
+        const maxImages = 50;
+        let loadedCount = 0;
+        let checkCount = 0;
+        
+        for (let i = 0; i < maxImages; i++) {
+          const fileName = i.toString().padStart(2, '0') + '.jpg';
+          
+          checkImageExists(fileName, function(exists) {
+            checkCount++;
+            
+            if (exists) {
+              availableImages.push({
+                url: fileName,
+                originalIndex: i
+              });
+              
+              // 如果是第一張圖片且只有一張，直接顯示
+              if (availableImages.length === 1 && checkCount === maxImages) {
+                createImageGrid();
+              }
+            }
+            
+            // 當所有圖片檢查完畢
+            if (checkCount === maxImages) {
+              createImageGrid();
+              imageCounter.textContent = `1/${availableImages.length}`;
+              
+              if (availableImages.length === 0) {
+                imageCounter.textContent = '無可用圖片';
+              }
+            }
+          });
+        }
+      }
+
+      // 創建圖片網格
+      function createImageGrid() {
+        imageGrid.innerHTML = ''; // 清空現有內容
+        
+        availableImages.forEach((image, index) => {
+          const container = document.createElement('div');
+          container.className = 'image-container';
+          
+          const img = document.createElement('img');
+          img.src = image.url;
+          img.alt = '包裝示例 ' + (index + 1);
+          
+          // 修改點：根據圖片數量決定點擊行為
+          img.addEventListener('click', function() {
+            // 如果只有一張圖片，直接在新標籤頁開啟圖片
+            if (availableImages.length === 1) {
+              window.open(image.url, '_blank');
+            } else {
+              openLightbox(index);
+            }
+          });
+          
+          container.appendChild(img);
+          imageGrid.appendChild(container);
+        });
+      }
+
+      // 開啟燈箱（只有當有多張圖片時才會呼叫）
+      function openLightbox(index) {
+        currentIndex = Math.max(0, Math.min(index, availableImages.length - 1));
+        lightboxImg.src = availableImages[currentIndex].url;
+        lightbox.style.display = 'flex';
+        updateCounter();
+        
+        // 顯示操作提示
+        gestureHint.style.display = 'block';
+        clearTimeout(hintTimeout);
+        hintTimeout = setTimeout(() => {
+          gestureHint.style.opacity = '0';
+          setTimeout(() => gestureHint.style.display = 'none', 500);
+        }, 3000);
+      }
+
+      // 關閉燈箱
+      function closeLightbox() {
+        lightbox.style.display = 'none';
+        gestureHint.style.display = 'none';
+        gestureHint.style.opacity = '1';
+      }
+
+      // 更新計數器
+      function updateCounter() {
+        imageCounter.textContent = `${currentIndex + 1}/${availableImages.length}`;
+      }
+
+      // 上一張
+      function showPrev() {
+        if (availableImages.length <= 1) return;
+        
+        currentIndex = (currentIndex - 1 + availableImages.length) % availableImages.length;
+        lightboxImg.src = availableImages[currentIndex].url;
+        updateCounter();
+      }
+
+      // 下一張
+      function showNext() {
+        if (availableImages.length <= 1) return;
+        
+        currentIndex = (currentIndex + 1) % availableImages.length;
+        lightboxImg.src = availableImages[currentIndex].url;
+        updateCounter();
+      }
+
+      // 觸摸事件處理
+      function handleTouchStart(e) {
+        if (e.touches.length === 1) {
+          touchStartX = e.touches[0].clientX;
+          isSingleTouch = true;
+        } else {
+          isSingleTouch = false;
+        }
+      }
+
+      function handleTouchEnd(e) {
+        if (isSingleTouch && e.changedTouches.length === 1 && availableImages.length > 1) {
+          const touchEndX = e.changedTouches[0].clientX;
+          const diffX = touchStartX - touchEndX;
+          const threshold = 50;
+
+          if (diffX > threshold) {
+            showNext();
+          } else if (diffX < -threshold) {
+            showPrev();
+          }
+        }
+      }
+
+      // 事件監聽
+      closeBtn.addEventListener('click', closeLightbox);
+      lightbox.addEventListener('touchstart', handleTouchStart, { passive: true });
+      lightbox.addEventListener('touchend', handleTouchEnd, { passive: true });
+
+      document.addEventListener('keydown', function(e) {
+        if (lightbox.style.display === 'flex') {
+          if (e.key === 'Escape') closeLightbox();
+          if (e.key === 'ArrowLeft' && availableImages.length > 1) showPrev();
+          if (e.key === 'ArrowRight' && availableImages.length > 1) showNext();
+        }
+      });
+
+      // 初始化
+      loadImages();
+    });
+  </script>
+</body>
+</html>
