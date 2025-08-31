@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MagSeek web</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 2.2em;
+      margin-bottom: 25px;
+      color: #2c3e50;
+      text-align: center;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+      padding: 0 10px;
+    }
+
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      width: 100%;
+      max-width: 700px;
+      margin: 0 auto;
+      justify-content: center;
+    }
+
+    .customer-box {
+      background-color: #ffffff;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px 15px;
+      font-size: 1.1em;
+      font-weight: bold;
+      color: #333;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+      text-align: center;
+      word-break: break-word;
+      overflow: hidden;
+      width: 100%;
+      /* 固定高度，类似图片比例 */
+      height: 180px;
+    }
+
+    .customer-box:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.12);
+    }
+
+    .customer-box.common-message {
+      color: #e74c3c;
+      border: 2px solid #e74c3c;
+    }
+
+    /* 操作演示样式 */
+    .customer-box.demo {
+      background-color: #3498db;
+      color: white;
+      border: none;
+    }
+    
+    .customer-box.demo:hover {
+      background-color: #2980b9;
+      box-shadow: 0 8px 16px rgba(41, 128, 185, 0.25);
+    }
+    
+    /* 產品訂購样式 */
+    .customer-box.product-order {
+      background-color: #27ae60;
+      color: white;
+      border: none;
+    }
+    
+    .customer-box.product-order:hover {
+      background-color: #219653;
+      box-shadow: 0 8px 16px rgba(39, 174, 96, 0.25);
+    }
+    
+    /* 產品展示样式 */
+    .customer-box.product-show {
+      background-color: #9b59b6;
+      color: white;
+      border: none;
+    }
+    
+    .customer-box.product-show:hover {
+      background-color: #8e44ad;
+      box-shadow: 0 8px 16px rgba(155, 89, 182, 0.25);
+    }
+    
+    /* 說明書样式 */
+    .customer-box.manual {
+      background-color: #f39c12;
+      color: white;
+      border: none;
+    }
+    
+    .customer-box.manual:hover {
+      background-color: #d35400;
+      box-shadow: 0 8px 16px rgba(243, 156, 18, 0.25);
+    }
+
+    /* 图标样式 */
+    .icon {
+      font-size: 2.2rem;
+      margin-bottom: 12px;
+    }
+
+    /* 桌面设备样式 */
+    @media (min-width: 1024px) {
+      .grid-container {
+        grid-template-columns: repeat(3, 1fr);
+        max-width: 1000px;
+        gap: 25px;
+      }
+      
+      .customer-box {
+        height: 200px;
+        padding: 25px 20px;
+        font-size: 1.2em;
+      }
+      
+      .icon {
+        font-size: 2.5rem;
+      }
+    }
+
+    /* 平板设备样式 */
+    @media (max-width: 1023px) and (min-width: 768px) {
+      .grid-container {
+        grid-template-columns: repeat(3, 1fr);
+        max-width: 800px;
+        gap: 22px;
+      }
+      
+      .customer-box {
+        height: 190px;
+        padding: 22px 18px;
+        font-size: 1.15em;
+      }
+      
+      .icon {
+        font-size: 2.3rem;
+      }
+    }
+
+    /* 大手机设备样式 */
+    @media (max-width: 767px) and (min-width: 481px) {
+      .grid-container {
+        grid-template-columns: repeat(2, 1fr);
+        max-width: 600px;
+        gap: 18px;
+      }
+      
+      .customer-box {
+        height: 170px;
+        padding: 18px 14px;
+        font-size: 1.1em;
+      }
+      
+      .icon {
+        font-size: 2rem;
+      }
+    }
+
+    /* 小手机设备样式 */
+    @media (max-width: 480px) {
+      body {
+        padding: 15px;
+      }
+      
+      .grid-container {
+        gap: 15px;
+      }
+      
+      .customer-box {
+        height: 150px;
+        padding: 15px 10px;
+        font-size: 1em;
+      }
+      
+      .icon {
+        font-size: 1.8rem;
+        margin-bottom: 8px;
+      }
+      
+      h1 {
+        font-size: 1.9em;
+        margin-bottom: 20px;
+      }
+    }
+
+    /* 超小手机设备样式 */
+    @media (max-width: 320px) {
+      .grid-container {
+        gap: 12px;
+      }
+      
+      .customer-box {
+        height: 140px;
+        padding: 12px 8px;
+        font-size: 0.95em;
+      }
+      
+      .icon {
+        font-size: 1.6rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>MagSeek-web</h1>
+
+  <div id="customer-grid" class="grid-container"></div>
+
+  <script>
+    const customers = [
+      { 
+        name: '產品訂購', 
+        file: 'https://myship.7-11.com.tw/general/detail/GM2508284046118',
+        class: 'product-order',
+        icon: 'fas fa-shopping-cart',
+        target: '_blank'
+      },
+            { 
+        name: '產品展示', 
+        file: '產品展示/',
+        class: 'product-show',
+        icon: 'fas fa-images'
+      },
+           { 
+        name: '操作演示', 
+        file: 'youtube-player.html?videoId=ZTG2LKzl_l4',
+        class: 'demo',
+        icon: 'fas fa-play-circle',
+        target: '_blank'
+      },
+      { 
+        name: '說明書', 
+        file: '說明書/',
+        class: 'manual',
+        icon: 'fas fa-book'
+      },
+           { 
+        name: '關於我', 
+        file: '關於我/',
+        class: 'common-message',
+        icon: 'fas fa-user'
+      },
+    ];
+
+    const container = document.getElementById('customer-grid');
+
+    function renderCustomerGrid() {
+      container.innerHTML = '';
+
+      customers.forEach(c => {
+        const link = document.createElement('a');
+        link.className = `customer-box ${c.class}`;
+        
+        link.href = c.file;
+        
+        link.innerHTML = `
+          <div class="icon"><i class="${c.icon}"></i></div>
+          <div>${c.name}</div>
+        `;
+        
+        if (c.target) {
+          link.target = c.target;
+        }
+        
+        container.appendChild(link);
+      });
+    }
+
+    renderCustomerGrid();
+  </script>
+  
+  <!-- Font Awesome 图标 -->
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</body>
+</html>
